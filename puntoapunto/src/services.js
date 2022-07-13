@@ -20,6 +20,12 @@ export async function postQuotation(body) {
   return response;
 }
 
+export async function getQuotation(id) {
+   return fetch(apiLink+"cotizacion/"+id).then((res) =>
+     res.json()
+   )
+};
+
 export function validate(input) {
   let errors = {};
   for (var iterable in input) {

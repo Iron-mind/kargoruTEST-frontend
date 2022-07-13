@@ -1,14 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PointForm from "./PointForm";
-import { postQuotation, validate, countErrors } from "../services";
+import { postQuotation, validate, countErrors,getQuotation } from "../services";
 import boxGif from '../imgs/box.gif'
 import truckGif from '../imgs/truck.gif'
 import ButtonOrLoading from './ButtonOrLoading'
 
-export default function Form() {
+export default function Form({Id=null, inputs={}}) { //'inputs' if quotation already exist
   let [loading, setLoading] = useState(false)
   let [input, setInput] = useState({
-
     fragil: false,
     puntos: [
       {continente:'',pais:'',ciudad:'',direccion:''},
@@ -21,9 +20,20 @@ export default function Form() {
     medidas:''
 
    });
+  let [quotized, setQuotized] = useState(false);
+  let [id, setId] = useState(Id);
   let [errors, setErrors]= useState({
     medidas:''
   })
+  useEffect(()=>{
+    if(id){
+        getQuotation(id).then((quotation)=>{
+          
+          setInput({...quotation, puntos:quotation.Puntos})
+       })
+
+    }
+  },[])
   function handleInputChange(e) {
 
     const inp = {
@@ -34,14 +44,17 @@ export default function Form() {
     setErrors(validate(inp))
 
   }
-  let valor = null
+
   async function  handleSubmit(e) {
     e.preventDefault();
     setLoading(true)
     let result = await postQuotation(input);
-    console.log(result);
-    valor=result.valor
     setLoading(false)
+    setQuotized(result.valor>0)
+
+    let idd = result.id? result.id: 0
+
+    setId(idd)
 
   }
  let btnSubmit = (<button
@@ -52,7 +65,7 @@ export default function Form() {
  >
    Enviar
  </button>)
- console.log(errors);
+
   return (
     <form className="container">
     <img src={truckGif} alt="truck"  className='truckGif my-3'/>
@@ -60,6 +73,7 @@ export default function Form() {
         <div className="col">
           <div className="form-outline">
             <input
+              value={input.nombre_cotizante}
               onChange={handleInputChange}
               name="nombre_cotizante"
               type="text"
@@ -74,6 +88,7 @@ export default function Form() {
         </div>
         <div className="col mb-3">
           <input
+            value={input.email_cotizante}
             onChange={handleInputChange}
             name="email_cotizante"
             type="email"
@@ -94,6 +109,7 @@ export default function Form() {
       <div className="row">
         <div className="col form-outline mb-4">
           <input
+            value={input.titulo}
             onChange={handleInputChange}
             name="titulo"
             placeholder="Televisor, bici, etc."
@@ -110,6 +126,7 @@ export default function Form() {
 
         <div className="col form-outline mb-4">
           <input
+            value={input.peso_kg}
             onChange={handleInputChange}
             name="peso_kg"
             type="number"
@@ -125,6 +142,7 @@ export default function Form() {
 
         <div className="col form-outline mb-4">
           <input
+          value={input.medidas}
             onChange={handleInputChange}
             name="medidas"
             placeholder="Ejemplo: '10x20 cm'"
@@ -141,6 +159,7 @@ export default function Form() {
 
         <div className="col sform-outline mb-4">
           <select
+            value={input.fragil}
             onChange={handleInputChange}
             name="fragil"
             id="input6"
@@ -184,7 +203,7 @@ export default function Form() {
       </div>
 
 
-      <ButtonOrLoading btn={btnSubmit} loading={loading} value={valor}/>
+      <ButtonOrLoading btn={btnSubmit} loading={loading} value={quotized} id={id}/>
 
 
 

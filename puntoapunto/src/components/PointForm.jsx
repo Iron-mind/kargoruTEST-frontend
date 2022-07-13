@@ -20,12 +20,14 @@ function getFilteredCountries (arr, continent) {
   return arr.filter((country) => country.continent === continent);
 };
 
-export default function ({ name, superSetInput, superInput ,setErrors,  index}) {
+export default function PointForm ({ name, superSetInput, superInput ,setErrors,  index}) {
   let [countries, setCountries] = useState([]);
   let [countriesFiltered, setCountriesFiltered] = useState([
     "Primero selecciona un continente",
   ]);
-  let [input,setInput] = useState({})
+  let [input,setInput] = useState({
+    continente:'',pais:'',ciudad:'',direccion:''
+  })
   let [continents, setContinents] = useState([]);
   let [errors, setmyErrors] = useState({})
 
@@ -33,9 +35,13 @@ export default function ({ name, superSetInput, superInput ,setErrors,  index}) 
     getContries().then((res) => {
       setCountries(res);
       setContinents(getContinents(res));
-      setInput(superInput.puntos[index]);
     });
   }, []);
+
+  useEffect(()=>{
+    
+    setInput(superInput.puntos[index]);
+  }, [superInput])
 
   function handleInputChange(e) {
 
@@ -70,14 +76,14 @@ export default function ({ name, superSetInput, superInput ,setErrors,  index}) 
       [e.target.name]: e.target.value,
     }))
   }
-  
+
   return (
     <div>
       <h3> {name}</h3>
       <div className="row mb-4">
         <div className="col">
           <div className="form-outline">
-            <select onChange={handleInputChange} name="continente" id="pinput1" className="form-select">
+            <select value={input.continente} onChange={handleInputChange} name="continente" id="pinput1" className="form-select">
               <option key={-1} defaultValue value="seleccionar">
                 seleccionar
               </option>
@@ -97,7 +103,7 @@ export default function ({ name, superSetInput, superInput ,setErrors,  index}) 
         </div>
         <div className="col mb-3">
           <div className="form-outline">
-            <select onChange={handleInputChange} name="pais" id="pinput2" className="form-select">
+            <select value={input.pais} onChange={handleInputChange} name="pais" id="pinput2" className="form-select">
               {countriesFiltered.length > 0
                 ? countriesFiltered.map((country,i) => {
 
@@ -114,7 +120,7 @@ export default function ({ name, superSetInput, superInput ,setErrors,  index}) 
         </div>
         <div className="col mb-3">
           <div className="form-outline">
-            <input name='ciudad' onChange={handleInputChange} type="text" id="pinput3" className="form-control" />
+            <input value={input.ciudad} name='ciudad' onChange={handleInputChange} type="text" id="pinput3" className="form-control" />
             <label className="form-label" htmlFor="pinput3">
               Ciudad
             </label>
@@ -124,7 +130,7 @@ export default function ({ name, superSetInput, superInput ,setErrors,  index}) 
         </div>
         <div className="col mb-3">
           <div className="form-outline">
-            <input name="direccion" onChange={handleInputChange} type="text" id="pinput4" className="form-control" />
+            <input value={input.direccion} name="direccion" onChange={handleInputChange} type="text" id="pinput4" className="form-control" />
             <label className="form-label" htmlFor="pinput4">
               Dirección
             </label>

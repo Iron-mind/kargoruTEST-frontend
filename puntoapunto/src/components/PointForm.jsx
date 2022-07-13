@@ -62,50 +62,52 @@ export default function ({ name, superSetInput, superInput , index}) {
   return (
     <div>
       <h3> {name}</h3>
-      <div class="row mb-4">
-        <div class="col">
-          <div class="form-outline">
-            <select onChange={handleInputChange} name="continente" id="pinput1" class="form-select">
-              <option selected value="seleccionar">
+      <div className="row mb-4">
+        <div className="col">
+          <div className="form-outline">
+            <select onChange={handleInputChange} name="continente" id="pinput1" className="form-select">
+              <option key={-1} defaultValue value="seleccionar">
                 seleccionar
               </option>
               {continents.length > 0
                 ? continents.map((continent,i) => {
+                
                     return <option key={i} value={continent}>{continent}</option>;
                   })
                 : null}
             </select>
-            <label class="form-label" for="pinput1">
+            <label className="form-label" htmlFor="pinput1">
               Continente
             </label>
           </div>
         </div>
-        <div class="col mb-3">
-          <div class="form-outline">
-            <select onChange={handleInputChange} name="pais" id="pinput2" class="form-select">
+        <div className="col mb-3">
+          <div className="form-outline">
+            <select onChange={handleInputChange} name="pais" id="pinput2" className="form-select">
               {countriesFiltered.length > 0
-                ? countriesFiltered.map((country) => {
-                    return <option key={country.id} value={country}>{country}</option>;
+                ? countriesFiltered.map((country,i) => {
+                 
+                    return <option key={i} value={country}>{country}</option>;
                   })
                 : null}
             </select>
-            <label class="form-label" for="pinput2">
+            <label className="form-label" htmlFor="pinput2">
               País
             </label>
           </div>
         </div>
-        <div class="col mb-3">
-          <div class="form-outline">
-            <input name='ciudad' onChange={handleInputChange} type="text" id="pinput3" class="form-control" />
-            <label class="form-label" for="pinput3">
+        <div className="col mb-3">
+          <div className="form-outline">
+            <input name='ciudad' onChange={handleInputChange} type="text" id="pinput3" className="form-control" />
+            <label className="form-label" htmlFor="pinput3">
               Ciudad
             </label>
           </div>
         </div>
-        <div class="col mb-3">
-          <div class="form-outline">
-            <input name="direccion" onChange={handleInputChange} type="text" id="pinput4" class="form-control" />
-            <label class="form-label" for="pinput4">
+        <div className="col mb-3">
+          <div className="form-outline">
+            <input name="direccion" onChange={handleInputChange} type="text" id="pinput4" className="form-control" />
+            <label className="form-label" htmlFor="pinput4">
               Dirección
             </label>
           </div>

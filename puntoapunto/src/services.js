@@ -14,8 +14,8 @@ export async function post(url = "", data = {}) {
 export async function  postQuotation(body) {
     console.log('enviando',body);
     const response = await post(apiLink + "cotizacion", body).then((res) => res.json());
-    if(!response.msg){
-        alert("Error al pedir la cotización "+msg);
+    if(response.hasOwnProperty('msg')){
+        alert("Error al pedir la cotización "+response.msg);
     }
     return response
   }

@@ -1,26 +1,61 @@
 import { useState } from "react";
 import PointForm from "./PointForm";
-import { postQuotation } from "../services";
+import { postQuotation, validate, countErrors } from "../services";
+import boxGif from '../imgs/box.gif'
+import truckGif from '../imgs/truck.gif'
+import ButtonOrLoading from './ButtonOrLoading'
 
 export default function Form() {
-  let [input, setInput] = useState({ fragil: false, puntos: [{}, {}] });
+  let [loading, setLoading] = useState(false)
+  let [input, setInput] = useState({
 
+    fragil: false,
+    puntos: [
+      {continente:'',pais:'',ciudad:'',direccion:''},
+       {continente:'',pais:'',ciudad:'',direccion:''}
+     ],
+    nombre_cotizante:'',
+    email_cotizante:'',
+    titulo:'',
+    peso_kg:0,
+    medidas:''
+
+   });
+  let [errors, setErrors]= useState({
+    medidas:''
+  })
   function handleInputChange(e) {
-    console.log(input);
-    setInput({
+
+    const inp = {
       ...input,
-      [e.target.name]: e.target.value,
-    });
-  }
+      [e.target.name]: e.target.value
+    }
+    setInput(inp);
+    setErrors(validate(inp))
 
-  function handleSubmit(e) {
+  }
+  let valor = null
+  async function  handleSubmit(e) {
     e.preventDefault();
-    postQuotation(input);
-    console.log(input);
-  }
+    setLoading(true)
+    let result = await postQuotation(input);
+    console.log(result);
+    valor=result.valor
+    setLoading(false)
 
+  }
+ let btnSubmit = (<button
+   type="submit"
+   className="btn btn-primary btn-block mb-4"
+   onClick={handleSubmit}
+   disabled={countErrors(errors)>0}
+ >
+   Enviar
+ </button>)
+ console.log(errors);
   return (
     <form className="container">
+    <img src={truckGif} alt="truck"  className='truckGif my-3'/>
       <div className="row mb-4">
         <div className="col">
           <div className="form-outline">
@@ -34,6 +69,7 @@ export default function Form() {
             <label className="form-label" htmlFor="nombre">
               Nombre
             </label>
+            <span className='danger_input'>{errors.nombre_cotizante}</span>
           </div>
         </div>
         <div className="col mb-3">
@@ -48,9 +84,13 @@ export default function Form() {
           <label htmlFor="email" className="form-label">
             Correo electronico
           </label>
+          <span className='danger_input'>{errors.email_cotizante}</span>
+
         </div>
       </div>
       <h3>¿Qué piensas enviar?</h3>
+      <img src={boxGif} alt="box"  className='boxGif my-3'/>
+
       <div className="row">
         <div className="col form-outline mb-4">
           <input
@@ -64,6 +104,8 @@ export default function Form() {
           <label className="form-label" htmlFor="input3">
             Titulo
           </label>
+          <span className='danger_input'>{errors.titulo}</span>
+
         </div>
 
         <div className="col form-outline mb-4">
@@ -77,6 +119,8 @@ export default function Form() {
           <label className="form-label" htmlFor="input4">
             Peso (kg)
           </label>
+          {errors.peso_kg && <span className='danger_input'>{errors.peso_kg}</span>}
+
         </div>
 
         <div className="col form-outline mb-4">
@@ -91,6 +135,8 @@ export default function Form() {
           <label className="form-l abel" htmlFor="input5">
             Medidas
           </label>
+          <span className='danger_input'>{errors.medidas}</span>
+
         </div>
 
         <div className="col sform-outline mb-4">
@@ -120,36 +166,28 @@ export default function Form() {
           superInput={input}
           superSetInput={setInput}
           index={0}
+          setErrors={setErrors}
+          errors={errors}
+
+
         />
         <PointForm
           name="Hasta PuntoB"
           superInput={input}
           superSetInput={setInput}
           index={1}
+          setErrors={setErrors}
+          errors={errors}
+
         />
+        <div className='danger_input'>{countErrors(errors)>0?'Llena los campos':null}</div>
       </div>
 
-      {/* <div className="form-check d-flex justify-content-center mb-4">
-        <input
-          className="form-check-input me-2"
-          type="checkbox"
-          value=""
-          id="input8"
-          checked
-        />
-        <label className="form-check-label" htmlFor="input8">
-          {" "}
-          Create an account?{" "}
-        </label>
-      </div> */}
 
-      <button
-        type="submit"
-        className="btn btn-primary btn-block mb-4"
-        onClick={handleSubmit}
-      >
-        Enviar
-      </button>
+      <ButtonOrLoading btn={btnSubmit} loading={loading} value={valor}/>
+
+
+
     </form>
   );
 }

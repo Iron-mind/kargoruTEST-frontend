@@ -18,3 +18,12 @@ code {
   height: 100%
 
 }
+.boxGif {
+  width: 20%
+}
+.truckGif{
+  width: 30%
+}
+.danger_input{
+  color: red;
+}

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useState } from "react";
-
+import {validate} from '../services.js'
 function getContries() {
   return fetch("https://api-wcountries.herokuapp.com/countries").then((res) =>
     res.json()
@@ -20,13 +20,14 @@ function getFilteredCountries (arr, continent) {
   return arr.filter((country) => country.continent === continent);
 };
 
-export default function ({ name, superSetInput, superInput , index}) {
+export default function ({ name, superSetInput, superInput ,setErrors,  index}) {
   let [countries, setCountries] = useState([]);
   let [countriesFiltered, setCountriesFiltered] = useState([
     "Primero selecciona un continente",
   ]);
   let [input,setInput] = useState({})
   let [continents, setContinents] = useState([]);
+  let [errors, setmyErrors] = useState({})
 
   useEffect(() => {
     getContries().then((res) => {
@@ -37,13 +38,13 @@ export default function ({ name, superSetInput, superInput , index}) {
   }, []);
 
   function handleInputChange(e) {
-    console.log(input);
+
     setInput({
       ...input,
       [e.target.name]: e.target.value,
     });
     if (e.target.name === "continente") {
-       
+
       setCountriesFiltered(
         getFilteredCountries(countries, e.target.value).map(
           (country) => country.name
@@ -52,13 +53,24 @@ export default function ({ name, superSetInput, superInput , index}) {
 
     }
     let arr = superInput.puntos?.slice();
-    arr[index]=input
-    console.log(arr);
+    arr[index]={
+      ...input,
+      [e.target.name]: e.target.value,
+    }
     superSetInput({
         ...superInput,
         puntos:[...arr]
     })
+    setErrors(validate({
+        ...superInput,
+        puntos:[...arr]
+    }))
+    setmyErrors(validate({
+      ...input,
+      [e.target.name]: e.target.value,
+    }))
   }
+  
   return (
     <div>
       <h3> {name}</h3>
@@ -71,7 +83,7 @@ export default function ({ name, superSetInput, superInput , index}) {
               </option>
               {continents.length > 0
                 ? continents.map((continent,i) => {
-                
+
                     return <option key={i} value={continent}>{continent}</option>;
                   })
                 : null}
@@ -79,6 +91,8 @@ export default function ({ name, superSetInput, superInput , index}) {
             <label className="form-label" htmlFor="pinput1">
               Continente
             </label>
+            <span className='danger_input'>{errors.continente}</span>
+
           </div>
         </div>
         <div className="col mb-3">
@@ -86,7 +100,7 @@ export default function ({ name, superSetInput, superInput , index}) {
             <select onChange={handleInputChange} name="pais" id="pinput2" className="form-select">
               {countriesFiltered.length > 0
                 ? countriesFiltered.map((country,i) => {
-                 
+
                     return <option key={i} value={country}>{country}</option>;
                   })
                 : null}
@@ -94,6 +108,8 @@ export default function ({ name, superSetInput, superInput , index}) {
             <label className="form-label" htmlFor="pinput2">
               País
             </label>
+            <span className='danger_input'>{errors.pais}</span>
+
           </div>
         </div>
         <div className="col mb-3">
@@ -102,6 +118,8 @@ export default function ({ name, superSetInput, superInput , index}) {
             <label className="form-label" htmlFor="pinput3">
               Ciudad
             </label>
+            <span className='danger_input'>{errors.ciudad}</span>
+
           </div>
         </div>
         <div className="col mb-3">
@@ -110,6 +128,8 @@ export default function ({ name, superSetInput, superInput , index}) {
             <label className="form-label" htmlFor="pinput4">
               Dirección
             </label>
+            <span className='danger_input'>{errors.direccion}</span>
+
           </div>
         </div>
       </div>

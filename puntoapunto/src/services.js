@@ -10,6 +10,49 @@ export async function post(url = "", data = {}) {
   });
   return response;
 }
+export async function put(url = "", data = {}) {
+  const response = fetch(url, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  return response;
+}
+
+export async function deleteRequest(url = "") {
+  const response = fetch(url, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    }
+  });
+  return response;
+}
+
+export async function putQuotation(body){
+  let response = await put(apiLink+'cotizacion',body).then((res) =>
+    res.json()
+  );
+  if (response.hasOwnProperty("msg")) {
+    alert("Error al Actualizar" + response.msg);
+  }else{
+    alert('Actualizado');
+  }
+  return response
+}
+
+export async function deleteQuotation(id){
+  let response = await deleteRequest(apiLink+'cotizacion/'+id).then((res) =>
+    res.json()
+  );
+  if (response.hasOwnProperty("msg")) {
+    if(response.msg=='deleted') return alert('Borrado')
+    alert( response.msg);
+  }
+  return response
+}
 export async function postQuotation(body) {
   const response = await post(apiLink + "cotizacion", body).then((res) =>
     res.json()

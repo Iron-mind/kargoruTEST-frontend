@@ -1,74 +1,121 @@
 import { useState, useEffect } from "react";
 import PointForm from "./PointForm";
-import { postQuotation, validate, countErrors,getQuotation } from "../services";
-import boxGif from '../imgs/box.gif'
-import truckGif from '../imgs/truck.gif'
-import ButtonOrLoading from './ButtonOrLoading'
-
-export default function Form({Id=null, inputs={}}) { //'inputs' if quotation already exist
-  let [loading, setLoading] = useState(false)
+import {
+  postQuotation,
+  validate,
+  countErrors,
+  getQuotation,
+  putQuotation,
+  deleteQuotation,
+} from "../services";
+import boxGif from "../imgs/box.gif";
+import truckGif from "../imgs/truck.gif";
+import ButtonOrLoading from "./ButtonOrLoading";
+import { Link } from "react-router-dom";
+export default function Form({ Id = null }) {
+  //'inputs' if quotation already exist
+  let [loading, setLoading] = useState(false);
   let [input, setInput] = useState({
     fragil: false,
     puntos: [
-      {continente:'',pais:'',ciudad:'',direccion:''},
-       {continente:'',pais:'',ciudad:'',direccion:''}
-     ],
-    nombre_cotizante:'',
-    email_cotizante:'',
-    titulo:'',
-    peso_kg:0,
-    medidas:''
-
-   });
+      { continente: "", pais: "", ciudad: "", direccion: "" },
+      { continente: "", pais: "", ciudad: "", direccion: "" },
+    ],
+    nombre_cotizante: "",
+    email_cotizante: "",
+    titulo: "",
+    peso_kg: 0,
+    medidas: "",
+  });
   let [quotized, setQuotized] = useState(false);
   let [id, setId] = useState(Id);
-  let [errors, setErrors]= useState({
-    medidas:''
-  })
-  useEffect(()=>{
-    if(id){
-        getQuotation(id).then((quotation)=>{
-          
-          setInput({...quotation, puntos:quotation.Puntos})
-       })
-
+  let [errors, setErrors] = useState({
+    medidas: "",
+  });
+  useEffect(() => {
+    if (id) {
+      getQuotation(id).then((quotation) => {
+        let q = { ...quotation, puntos: quotation.Puntos };
+        setInput(q);
+        setErrors(validate(q));
+      });
     }
-  },[])
+  }, []);
   function handleInputChange(e) {
-
     const inp = {
       ...input,
-      [e.target.name]: e.target.value
-    }
+      [e.target.name]: e.target.value,
+    };
     setInput(inp);
-    setErrors(validate(inp))
-
+    setErrors(validate(inp));
   }
 
-  async function  handleSubmit(e) {
+
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    setLoading(true)
+    setLoading(true);
     let result = await postQuotation(input);
-    setLoading(false)
-    setQuotized(result.valor>0)
-
-    let idd = result.id? result.id: 0
-
-    setId(idd)
-
+    setLoading(false);
+    setQuotized(result.valor > 0);
+    let idd = result.id ? result.id : 0;
+    setId(idd);
   }
- let btnSubmit = (<button
-   type="submit"
-   className="btn btn-primary btn-block mb-4"
-   onClick={handleSubmit}
-   disabled={countErrors(errors)>0}
- >
-   Enviar
- </button>)
+
+  async function handleUpdate(e) {
+    e.preventDefault();
+    setLoading(true);
+    await putQuotation(input);
+    setLoading(false);
+  }
+  async function handleDelete(e) {
+    setLoading(true);
+    await deleteQuotation(input.id);
+    setLoading(false);
+  }
+  let btnSubmit = (
+    <button
+      type="submit"
+      className="btn btn-primary btn-block mb-4"
+      onClick={handleSubmit}
+      disabled={countErrors(errors) > 0}
+    >
+      Enviar
+    </button>
+  );
+  let btnDelete = (
+    <Link to="/cotizar">
+      <button
+        type="submit"
+        className="btn btn-danger btn-block  mx-2 mb-4"
+        onClick={handleDelete}
+      >
+        Borrar
+      </button>
+    </Link>
+  );
+  let btnUpdate = (
+    <>
+      <button
+        type="submit"
+        className="btn btn-primary btn-block mx-2 mb-4"
+        onClick={handleUpdate}
+      >
+        Actualizar
+      </button>
+      {btnDelete}
+    </>
+  );
 
   return (
     <form className="container">
-    <img src={truckGif} alt="truck"  className='truckGif my-3'/>
+      {Id ? (
+        <h2>
+          {" "}
+          Valor cotizado <i className="text-success">${input.valor}</i>{" "}
+        </h2>
+      ) : null}
+      <img src={truckGif} alt="truck" className="truckGif my-3" />
       <div className="row mb-4">
         <div className="col">
           <div className="form-outline">
@@ -83,7 +130,7 @@ export default function Form({Id=null, inputs={}}) { //'inputs' if quotation alr
             <label className="form-label" htmlFor="nombre">
               Nombre
             </label>
-            <span className='danger_input'>{errors.nombre_cotizante}</span>
+            <span className="danger_input">{errors.nombre_cotizante}</span>
           </div>
         </div>
         <div className="col mb-3">
@@ -99,12 +146,11 @@ export default function Form({Id=null, inputs={}}) { //'inputs' if quotation alr
           <label htmlFor="email" className="form-label">
             Correo electronico
           </label>
-          <span className='danger_input'>{errors.email_cotizante}</span>
-
+          <span className="danger_input">{errors.email_cotizante}</span>
         </div>
       </div>
       <h3>¿Qué piensas enviar?</h3>
-      <img src={boxGif} alt="box"  className='boxGif my-3'/>
+      <img src={boxGif} alt="box" className="boxGif my-3" />
 
       <div className="row">
         <div className="col form-outline mb-4">
@@ -120,8 +166,7 @@ export default function Form({Id=null, inputs={}}) { //'inputs' if quotation alr
           <label className="form-label" htmlFor="input3">
             Titulo
           </label>
-          <span className='danger_input'>{errors.titulo}</span>
-
+          <span className="danger_input">{errors.titulo}</span>
         </div>
 
         <div className="col form-outline mb-4">
@@ -136,13 +181,14 @@ export default function Form({Id=null, inputs={}}) { //'inputs' if quotation alr
           <label className="form-label" htmlFor="input4">
             Peso (kg)
           </label>
-          {errors.peso_kg && <span className='danger_input'>{errors.peso_kg}</span>}
-
+          {errors.peso_kg && (
+            <span className="danger_input">{errors.peso_kg}</span>
+          )}
         </div>
 
         <div className="col form-outline mb-4">
           <input
-          value={input.medidas}
+            value={input.medidas}
             onChange={handleInputChange}
             name="medidas"
             placeholder="Ejemplo: '10x20 cm'"
@@ -153,8 +199,7 @@ export default function Form({Id=null, inputs={}}) { //'inputs' if quotation alr
           <label className="form-l abel" htmlFor="input5">
             Medidas
           </label>
-          <span className='danger_input'>{errors.medidas}</span>
-
+          <span className="danger_input">{errors.medidas}</span>
         </div>
 
         <div className="col sform-outline mb-4">
@@ -167,12 +212,16 @@ export default function Form({Id=null, inputs={}}) { //'inputs' if quotation alr
           >
             <option key={1} default value={false}>
               No
-            </option >
+            </option>
             <option key={2} default value={true}>
               Sí
             </option>
           </select>
-          <label onChange={handleInputChange} className="form-label" htmlFor="input6">
+          <label
+            onChange={handleInputChange}
+            className="form-label"
+            htmlFor="input6"
+          >
             Frágil
           </label>
         </div>
@@ -187,8 +236,6 @@ export default function Form({Id=null, inputs={}}) { //'inputs' if quotation alr
           index={0}
           setErrors={setErrors}
           errors={errors}
-
-
         />
         <PointForm
           name="Hasta PuntoB"
@@ -197,16 +244,27 @@ export default function Form({Id=null, inputs={}}) { //'inputs' if quotation alr
           index={1}
           setErrors={setErrors}
           errors={errors}
-
         />
-        <div className='danger_input'>{countErrors(errors)>0?'Llena los campos':null}</div>
+        <div className="danger_input">
+          {countErrors(errors) > 0 ? "Llena los campos" : null}
+        </div>
       </div>
 
-
-      <ButtonOrLoading btn={btnSubmit} loading={loading} value={quotized} id={id}/>
-
-
-
+      {!Id ? (
+        <ButtonOrLoading
+          btn={btnSubmit}
+          loading={loading}
+          value={quotized}
+          id={id}
+        />
+      ) : (
+        <ButtonOrLoading
+          btn={btnUpdate}
+          loading={loading}
+          value={false}
+          id={id}
+        />
+      )}
     </form>
   );
 }

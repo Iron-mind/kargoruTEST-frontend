@@ -5,7 +5,7 @@ export default function ButtonOrLoading({ btn, loading, value, id }) {
   return (
     <>
       {loading ? (
-        <div>cargando...</div>
+        <div className='py-5 '>Cargando...</div>
       ) : (
         <div>
           {!value ? (
